@@ -213,28 +213,24 @@ class Character_Management(OpenRTM_aist.DataFlowComponentBase):
             print("座標データが受信されました。")
             coord_data = self._coordinateIn.read()
             print("受け取った座標:",coord_data.data)
-       
-            
             process_coord_data=coord_data
             self._processed_coordinateOut.write(process_coord_data)
-            
             print("送信した座標:",process_coord_data.data)
-            
          
-        if self._imageIn.isNew():
+        elif self._imageIn.isNew():
             print("画像データが受信されました")
             image_data = self._imageIn.read()
             print("受け取った画像:", image_data.data)
             process_image_data=image_data
-            self._processed_coordinateOut.write(process_image_data)
+            self._processed_imageOut.write(process_image_data)
             print("送信した画像:", self._processed_image.data)
 
-        if self._voiceIn.isNew():
+        elif self._voiceIn.isNew():
             print("音声データが受信されました")
             voice_data = self._voiceIn.read()
             print("受け取った音声:", voice_data.data)
             process_voice_data=voice_data
-            self._processed_coordinateOut.write(process_voice_data)
+            self._processed_voiceOu.write(process_voice_data)
             print("送信した音声:", self._processed_voice.data)
     
         return RTC.RTC_OK
