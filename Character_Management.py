@@ -12,7 +12,6 @@
 """
 # </rtc-template>
 
-import numpy as np
 import sys
 import time
 sys.path.append(".")
@@ -126,6 +125,7 @@ class Character_Management(OpenRTM_aist.DataFlowComponentBase):
         # Set CORBA Service Ports
 		
         return RTC.RTC_OK
+	
     ###
     ## 
     ## The finalize action (on ALIVE->END transition)
@@ -200,38 +200,50 @@ class Character_Management(OpenRTM_aist.DataFlowComponentBase):
     #
     #
     def onExecute(self, ec_id):
-        
-        coord_data=None
-        image_data=None
-        voice_data=None
-        
-        process_coord_data=None
-        process_image_data=None
-        process_voice_data=None
-        
-        if self._coordinateIn.isNew():
-            print("座標データが受信されました。")
-            coord_data = self._coordinateIn.read()
-            print("受け取った座標:",coord_data.data)
-            process_coord_data=coord_data
-            self._processed_coordinateOut.write(process_coord_data)
-            print("送信した座標:",process_coord_data.data)
-         
-        elif self._imageIn.isNew():
-            print("画像データが受信されました")
-            image_data = self._imageIn.read()
-            print("受け取った画像:", image_data.data)
-            process_image_data=image_data
-            self._processed_imageOut.write(process_image_data)
-            print("送信した画像:", self._processed_image.data)
+        #追加座標
+        if self._voiceIn.isNew():
+            print("#####オブジェクト管理######")
+            #追加音声の読み込み
+            print("音声読み込み開始")
+            voiceIn_data_list = []
+            while self._voiceIn.isNew():
+                voiceIn_data = self._voiceIn.read().data
+                #voiceIn_data_list += voiceIn_data
+                voiceIn_data_list.append(voiceIn_data)
+            print("現在の音声配列の長さ："+ str(len(voiceIn_data_list)))
+            #Voice出力
+            for data in voiceIn_data_list:
+                Outvoice = RTC.TimedOctetSeq(RTC.Time(0,0),data)
+                self._processed_voiceOut.write(Outvoice)
 
-        elif self._voiceIn.isNew():
-            print("音声データが受信されました")
-            voice_data = self._voiceIn.read()
-            print("受け取った音声:", voice_data.data)
-            process_voice_data=voice_data
-            self._processed_voiceOu.write(process_voice_data)
-            print("送信した音声:", self._processed_voice.data)
+        if self._imageIn.isNew():
+            #追加画像の読み込み
+            print("画像読み込み開始")
+            imageIn_data_list = []
+            while self._imageIn.isNew():
+                imageIn_data = self._imageIn.read().data
+                #imageIn_data_list += imageIn_data
+                imageIn_data_list.append(imageIn_data)
+            print("現在の画像配列の長さ："+ str(len(imageIn_data_list)))
+            #imageの出力
+            for data in imageIn_data_list:
+                Outimage = RTC.TimedOctetSeq(RTC.Time(0,0),data)
+                self._processed_imageOut.write(Outimage)
+
+        if self._coordinateIn.isNew():
+            #追加座標の読み込み
+            print("座標読み込み開始")
+            coordinateIn_data_list = []
+            while self._coordinateIn.isNew():
+                coordinateIn_data = self._coordinateIn.read().data
+                coordinateIn_data_list.append(coordinateIn_data)
+            print("現在の座標配列の長さ："+ str(len(coordinateIn_data_list)))
+            #追加座標の出力
+            for data in coordinateIn_data_list:
+                OutCoordinate = RTC.TimedShortSeq(RTC.Time(0,0),data)
+                self._processed_coordinateOut.write(OutCoordinate)
+
+            
     
         return RTC.RTC_OK
 	
